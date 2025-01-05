@@ -56,7 +56,7 @@ return [
     'manage_resources_table_owner'=>'Owner',
     'manage_resources_no_resources' => 'There are no resources',
     'list_article_new' => 'New',
-    'list_article_manage' => 'Persoanl Articles',
+    'list_article_manage' => 'Personal Articles',
     'view_article_edit' => 'Edit',
     'view_article_manage' => 'Personal Articles',
     'manage_donation_info' => "Congrats on reaching 10 articles! I hope you enjoy working with seat-info. To support the development, have you considered donating something? Donations are always welcome and motivate me to put more effort into this project, although they are by no means required. If you end up using this module a lot, I'd appreciate a donation. You can give ISK or contract PLEX and Ships to 'recursivetree'.",
