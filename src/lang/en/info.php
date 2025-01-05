@@ -73,7 +73,7 @@ return [
     'manage_resource_upload_success' => 'Successfully uploaded file!',
     'resource_not_found' => 'Could not find requested resource!',
     'manage_resource_delete_success' => 'Successfully deleted file!',
-    'about_donation_info' => "I hope you enjoy working with seat-info. To support the development, have you considered donating something? Donations are always welcome and motivate me to put more effort into this project, although they are by no means required. If you end up using this module a lot, I'd appreciate a donation. You can give ISK or contract PLEX and Ships to 'recursivetree'.",
+    'about_donation_info' => "I hope you enjoy working with seat-info. To support the development, have you considered donating something? Donations are always welcome and motivate me to put more effort into this project, although they are by no means required. If you end up using this module a lot, I'd appreciate a donation. You can use the creator code 'RECURSIVETREE' during checkout in the eve store to donate 5% of your purchase, or you can send ISK, PLEX or Ships to 'recursivetree'.",
     'about_ace_text_editor' => 'This plugin uses the ace text editor.',
     'about_website_link' => 'Website',
     'about_github_link' => 'Github',
