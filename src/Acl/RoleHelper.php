@@ -40,4 +40,10 @@ class RoleHelper
         if ($role == null) return $default;
         return Role::find($role) != null ? $role:$default;
     }
+
+    public static function ensureDefaultRolesExist()
+    {
+        self::getDefaultEditRole();
+        self::getDefaultViewRole();
+    }
 }

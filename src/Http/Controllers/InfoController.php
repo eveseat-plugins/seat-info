@@ -140,28 +140,11 @@ class InfoController extends Controller
     public function getCreateView(){
         $article = new Article();
 
-        $editAclRole = new ArticleAclRole();
-        $editAclRole->role =  RoleHelper::getDefaultEditRole();
-        $editAclRole->allows_edit = true;
+        RoleHelper::ensureDefaultRolesExist();
+        $roles = Role::all();
+        $acl_roles = collect();
 
-        $viewAclRole = new ArticleAclRole();
-        $viewAclRole->role =  RoleHelper::getDefaultViewRole();
-        $viewAclRole->allows_view = true;
-
-        //fake the relation
-        $roles = collect([$editAclRole, $viewAclRole]);
-
-        $other_roles = Role::whereNotIn("id",$roles->pluck("role"))
-            ->get()
-            ->map(function ($role){
-                $aclRole = new ArticleAclRole();
-                $aclRole->role = $role->id;
-                return $aclRole;
-            });
-
-        $roles = $roles->merge($other_roles);
-
-        return view("info::edit", compact('article','roles'));
+        return view("info::edit", compact('article','roles', 'acl_roles'));
     }
 
     public function getSaveInterface(User $user,Request $request){
@@ -170,8 +153,7 @@ class InfoController extends Controller
             "name"=>"required|string",
             "text"=>"required|string",
             "public"=>"nullable",
-            "aclAccessType"=>"required|array",
-            "aclAccessType.*"=>"required|string|in:nothing,edit,view"
+            "aclRoleData"=>"required|json",
         ]);
 
         $article = Article::find($request->id);
@@ -206,17 +188,16 @@ class InfoController extends Controller
         $article->save();
 
         $article->aclRoles()->delete();
-
-        foreach ($request->aclAccessType as $id=>$value){
-            if($value === "nothing") continue;
+        $roleData = json_decode($request->aclRoleData);
+        foreach ($roleData as $data){
             $aclRole = new ArticleAclRole();
             $aclRole->article = $article->id;
-            if($value==="edit") {
-                $aclRole->role = RoleHelper::checkForExistenceOrDefault($id, RoleHelper::getDefaultEditRole());
+            if($data->state==="edit") {
+                $aclRole->role = RoleHelper::checkForExistenceOrDefault($data->roleID, RoleHelper::getDefaultEditRole());
                 $aclRole->allows_edit = true;
             }
-            if($value==="view") {
-                $aclRole->role = RoleHelper::checkForExistenceOrDefault($id, RoleHelper::getDefaultViewRole());
+            if($data->state==="view") {
+                $aclRole->role = RoleHelper::checkForExistenceOrDefault($data->roleID, RoleHelper::getDefaultViewRole());
                 $aclRole->allows_view = true;
             }
             $aclRole->save();
@@ -231,24 +212,10 @@ class InfoController extends Controller
 
         $article = Article::find($id);
 
-        if ($article===null){
-            $request->session()->flash('error', trans("info::info.manage_article_not_found"));
-            return redirect()->route('info.manage');
-        }
+        $roles = Role::all();
+        $acl_roles = ArticleAclRole::where("article", $id)->get();
 
-        $roles = $article->aclRoles;
-
-        $other_roles = Role::whereNotIn("id",$roles->pluck("role"))
-            ->get()
-            ->map(function ($role){
-                $aclRole = new ArticleAclRole();
-                $aclRole->role = $role->id;
-                return $aclRole;
-            });
-
-        $roles = $roles->toBase()->merge($other_roles->toBase());
-
-        return view("info::edit", compact('article', 'roles'));
+        return view("info::edit", compact('article', 'roles', 'acl_roles'));
     }
 
     public function getListView(){

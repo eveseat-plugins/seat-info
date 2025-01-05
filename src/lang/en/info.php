@@ -96,7 +96,7 @@ return [
     'configure_resource_personal_article_link' => 'Back',
     'configure_resources_reupload_label' => 'Reupload File (max: :max)',
     'configure_resources_upload_choose' => 'Choose a replacement file or leave it empty to keep the current one',
-    'edit_article_acl_help'=>'Seat-Info manages access over seat roles. To configure access for this article head over to access management under the settings section. In there, you can create roles and add members. To automatically manage members, take a look at squads.',
+    'edit_article_acl_help'=>'Seat-Info manages access over seat roles, configured under access management in the settings section. To automatically manage members, take a look at squads.',
     'configure_resource_acl_help'=>'Seat-Info manages access over seat roles. To configure access for this article head over to access management under the settings section. In there, you can create roles and add members. To automatically manage members, take a look at squads.',
     'permalink_not_found'=>'This permalink doesn\'t exist. Maybe try to search through the article list.',
     'permalink_in_use'=>'This permalink name is already in use!',
@@ -108,5 +108,9 @@ return [
     'add_permalink_name_placeholder'=>'Enter the name of you new permalink',
     'delete_button'=>'Delete',
     'permalink_delete_modal'=>'permalink',
-    'permalink_deleted'=>'Successfully deleted permalink!'
+    'permalink_deleted'=>'Successfully deleted permalink!',
+    'add_role' => 'Add Role',
+    'acl_no_roles_configured'=>'No roles have been granted access to this article. It is only accessible to you and administrators. Grant access with the \'Add Role\' button above.',
+    'edit' => 'Edit',
+    'view' => 'View',
 ];
