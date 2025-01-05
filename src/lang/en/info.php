@@ -113,4 +113,6 @@ return [
     'acl_no_roles_configured'=>'No roles have been granted access to this article. It is only accessible to you and administrators. Grant access with the \'Add Role\' button above.',
     'edit' => 'Edit',
     'view' => 'View',
+    'permission_change_order'=>'Change Article Order',
+    'permission_change_order_desc'=>'Allows you to change the order of articles on the start page'
 ];

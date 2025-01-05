@@ -177,6 +177,10 @@ class InfoController extends Controller
         $article->name = $request->name;
         $article->text = $request->text;
 
+        if($article->order === null) {
+            $article->order = Article::max("order") + 1;
+        }
+
         if(Gate::allows("info.make_public")){
             $article->public = isset($request->public);
         }
@@ -220,7 +224,7 @@ class InfoController extends Controller
 
     public function getListView(){
 
-        $articles = Article::orderBy("pinned","desc")->get()->filter(function ($article){
+        $articles = Article::orderBy("pinned","desc")->orderBy("order","asc")->get()->filter(function ($article){
             return Gate::allows("info.article.view",$article->id);
         });
         return view("info::list", compact('articles'));
@@ -236,6 +240,28 @@ class InfoController extends Controller
         });
 
         return view("info::manage", compact('articles','resources'));
+    }
+
+    public function swapOrder(Request $request)
+    {
+        $request->validate([
+            'article_1'=>'required|integer',
+            'article_2'=>'required|integer'
+        ]);
+
+        $article1 = Article::find($request->article_1);
+        $article2 = Article::find($request->article_2);
+
+        if($article1===null || $article2===null) return response()->json([], 400);
+
+        $temp = $article1->order;
+        $article1->order = $article2->order;
+        $article2->order = $temp;
+
+        $article1->save();
+        $article2->save();
+
+        return response()->json([]);
     }
 
     public function getArticleView(Request $request, $article_id_name){

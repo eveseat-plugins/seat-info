@@ -27,6 +27,12 @@ Route::group([
         'uses' => 'InfoController@getSaveInterface',
     ]);
 
+    Route::post('/article/order/swap', [
+        'as'   => 'info.swapOrder',
+        'uses' => 'InfoController@swapOrder',
+        'middleware' => 'can:info.change_order'
+    ]);
+
     //permission in controller
     Route::get('/article/edit/{id}', [
         'as'   => 'info.edit_article',

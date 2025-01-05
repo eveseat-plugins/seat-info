@@ -26,4 +26,8 @@ return [
         'label' => 'info::info.permission_edit_permalinks',
         'description' => 'info::info.permission_edit_permalinks_desc',
     ],
+    'change_order' => [
+        'label' => 'info::info.permission_change_order',
+        'description' => 'info::info.permission_change_order_desc',
+    ],
 ];
