@@ -339,19 +339,10 @@ class InfoController extends Controller
             return redirect()->back();
         }
 
-        $roles = $resource->aclRoles;
+        $roles = Role::all();
+        $acl_roles = ResourceAclRole::where("resource", $id)->get();
 
-        $other_roles = Role::whereNotIn("id",$roles->pluck("role"))
-            ->get()
-            ->map(function ($role){
-                $aclRole = new ResourceAclRole();
-                $aclRole->role = $role->id;
-                return $aclRole;
-            });
-
-        $roles = $roles->toBase()->merge($other_roles->toBase());
-
-        return view("info::resource",compact("resource","roles"));
+        return view("info::resource",compact("resource","roles", "acl_roles"));
     }
 
     public function disableDonationInfo(){
@@ -362,10 +353,9 @@ class InfoController extends Controller
     public function configureResourceSave(Request $request, $id){
         $request->validate([
             "name"=>"required|string",
-            "aclAccessType"=>"required|array",
-            "aclAccessType.*"=>"required|string|in:nothing,edit,view",
             "file" => "nullable|file",
-            "mime_src_client" => "nullable"
+            "mime_src_client" => "nullable",
+            "aclRoleData"=>"required|json",
         ]);
 
         Gate::authorize("info.resource.edit", $id);
@@ -396,16 +386,16 @@ class InfoController extends Controller
         $resource->save();
 
         $resource->aclRoles()->delete();
-        foreach ($request->aclAccessType as $id=>$value){
-            if($value === "nothing") continue;
+        $roleData = json_decode($request->aclRoleData);
+        foreach ($roleData as $data){
             $aclRole = new ResourceAclRole();
             $aclRole->resource = $resource->id;
-            if($value==="edit") {
-                $aclRole->role = RoleHelper::checkForExistenceOrDefault($id, null);
+            if($data->state==="edit") {
+                $aclRole->role = RoleHelper::checkForExistenceOrDefault($data->roleID, RoleHelper::getDefaultEditRole());
                 $aclRole->allows_edit = true;
             }
-            if($value==="view") {
-                $aclRole->role = RoleHelper::checkForExistenceOrDefault($id, null);
+            if($data->state==="view") {
+                $aclRole->role = RoleHelper::checkForExistenceOrDefault($data->roleID, RoleHelper::getDefaultViewRole());
                 $aclRole->allows_view = true;
             }
             $aclRole->save();
