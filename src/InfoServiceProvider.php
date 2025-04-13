@@ -6,12 +6,10 @@ use RecursiveTree\Seat\InfoPlugin\Acl\ArticlePolicy;
 use RecursiveTree\Seat\InfoPlugin\Acl\ResourcePolicy;
 use RecursiveTree\Seat\InfoPlugin\Model\Article;
 use RecursiveTree\Seat\InfoPlugin\Model\Resource;
-use RecursiveTree\Seat\InfoPlugin\Observers\RoleObserver;
 use RecursiveTree\Seat\InfoPlugin\Observers\UserObserver;
 use Seat\Services\AbstractSeatPlugin;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
-use Seat\Web\Models\Acl\Role;
 use Illuminate\Support\Facades\Artisan;
 use Seat\Web\Models\User;
 
@@ -42,7 +40,6 @@ class InfoServiceProvider extends AbstractSeatPlugin
         Gate::define('info.resource.view',[ResourcePolicy::class,"view"]);
         Gate::define('info.resource.edit',[ResourcePolicy::class,"edit"]);
 
-        Role::observe(RoleObserver::class);
         User::observe(UserObserver::class);
 
         //artisan commands
