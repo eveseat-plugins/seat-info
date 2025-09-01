@@ -51,17 +51,18 @@
 
                                 <div class="btn-group mb-1 btn-group-sm">
 
-                                    <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown"><i
-                                                class="fas fa-heading"></i></button>
-                                    <div class="dropdown-menu">
-                                        <button type="button" class="dropdown-item" id="button-insert-heading-1">H1</button>
-                                        <button type="button" class="dropdown-item" id="button-insert-heading-2">H2</button>
-                                        <button type="button" class="dropdown-item" id="button-insert-heading-3">H3</button>
-                                        <button type="button" class="dropdown-item" id="button-insert-heading-4">H4</button>
-                                        <button type="button" class="dropdown-item" id="button-insert-heading-5">H5</button>
-                                        <button type="button" class="dropdown-item" id="button-insert-heading-6">H6</button>
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown"><i
+                                                    class="fas fa-heading"></i></button>
+                                        <div class="dropdown-menu">
+                                            <button type="button" class="dropdown-item" id="button-insert-heading-1">H1</button>
+                                            <button type="button" class="dropdown-item" id="button-insert-heading-2">H2</button>
+                                            <button type="button" class="dropdown-item" id="button-insert-heading-3">H3</button>
+                                            <button type="button" class="dropdown-item" id="button-insert-heading-4">H4</button>
+                                            <button type="button" class="dropdown-item" id="button-insert-heading-5">H5</button>
+                                            <button type="button" class="dropdown-item" id="button-insert-heading-6">H6</button>
+                                        </div>
                                     </div>
-
 
                                     <button type="button" class="btn btn-secondary" id="button-insert-paragraph"><i
                                                 class="fas fa-paragraph"></i></button>
@@ -79,6 +80,16 @@
                                                 class="fas fa-list-ol"></i></button>
                                     <button type="button" class="btn btn-secondary" id="button-insert-color"><i
                                                 class="fas fa-palette"></i></button>
+
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" id="icon-search-initiate"><i
+                                                    class="fas fa-satellite"></i></button>
+                                        <div class="dropdown-menu">
+                                            <input type="text" class="dropdown-item" placeholder="Search item..." id="icon-search">
+                                            <div id="icon-search-results">
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div class="d-flex w-100" style="height: 60vh;">
@@ -153,6 +164,7 @@
         form.addEventListener("submit",()=>{
             window.removeEventListener("beforeunload",beforeUnload)
         })
+
 
         class MarkupEditor {
             editor;
@@ -414,6 +426,48 @@
         })
         document.getElementById("button-insert-color").addEventListener("click", function () {
             editor.updateSelection("color","<color color=\"red\">", "</color>", null, position_after_center_section=true)
+        })
+
+        let iconSearchAbort = new AbortController()
+        document.getElementById("icon-search-initiate").addEventListener("click",()=>{
+            // the input is still hidden when activating the button, so focus does nothing.
+            // I couldn't find an event that triggers after it is visible, so we hack-fix it with some delay
+            setTimeout(()=>document.getElementById("icon-search").focus(),10)
+        })
+        document.getElementById("icon-search").addEventListener("input",async function (e){
+            iconSearchAbort.abort()
+            iconSearchAbort = new AbortController()
+
+            const searchTerm = e.target.value
+            try {
+                const req = await fetch(`{{route("seatcore::fastlookup.items")}}?q=${encodeURIComponent(searchTerm)}`, {
+                    signal: iconSearchAbort.signal
+                })
+                const response = await req.json()
+
+                response.results.sort((a, b) => {
+                    return a.text.length - b.text.length
+                })
+
+                const btnTarget = document.getElementById("icon-search-results")
+                btnTarget.textContent = "" // clear contents
+                for (let i = 0; i < Math.min(10, response.results.length); i++) {
+                    const item = response.results[i];
+                    const btn = document.createElement("button")
+                    btn.classList.add("dropdown-item")
+                    btn.type = "button"
+                    btn.textContent = item.text
+                    btnTarget.appendChild(btn)
+                    btn.addEventListener("click", function () {
+                        editor.updateSelection(null, null, null, `<icon src="eve:type-icon/${item.id}/${item.text}" alt="${item.text}" />`)
+                        // reset search
+                        document.getElementById("icon-search").value = ""
+                        btnTarget.textContent = ""
+                    })
+                }
+            } catch (e) {
+                if(!(e instanceof DOMException && e.name === "AbortError")) throw e;
+            }
         })
     </script>
 @endpush
