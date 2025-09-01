@@ -84,25 +84,25 @@ SeatInfoMarkupRenderer.registerCommonProperty("click-to-copy",(property, element
 
 
 class SeatInfoMarkupElementHelper {
-    static simpleElement(markupName, htmlName) {
+    static simpleElement(markupName, htmlName, isInlineElement=true) {
         SeatInfoMarkupRenderer.registerElement(markupName, false, function (elementInfo, htmlElement) {
             return {
                 dom: htmlElement(htmlName).content(elementInfo.content)
             }
-        })
+        }, isInlineElement)
     }
 
-    static simpleSelfClosingElement(markupName, htmlName) {
+    static simpleSelfClosingElement(markupName, htmlName, isInlineElement=true) {
         SeatInfoMarkupRenderer.registerElement(markupName, true, function (elementInfo, htmlElement) {
             return {
                 dom: htmlElement("span").content(htmlElement(htmlName)),
                 noContent: true,
                 disabledCommonProperties: ["text-align","click-to-copy"]
             }
-        })
+        }, isInlineElement)
     }
 
-    static simpleLimitedContentElement(markupName, htmlName, allowedChildren = [], allowText = false) {
+    static simpleLimitedContentElement(markupName, htmlName, allowedChildren = [], allowText = false, isInlineElement=true) {
         SeatInfoMarkupRenderer.registerElement(markupName, false, function (elementInfo, htmlElement) {
             return {
                 dom: htmlElement(htmlName).content(elementInfo.content.filter((e) => {
@@ -117,23 +117,23 @@ class SeatInfoMarkupElementHelper {
                     return true
                 }))
             }
-        })
+        }, isInlineElement)
     }
 }
 
-SeatInfoMarkupElementHelper.simpleElement("p", "p")
-SeatInfoMarkupElementHelper.simpleElement("b", "b")
-SeatInfoMarkupElementHelper.simpleElement("i", "i")
-SeatInfoMarkupElementHelper.simpleElement("s", "s")
-SeatInfoMarkupElementHelper.simpleElement("h1", "h1")
-SeatInfoMarkupElementHelper.simpleElement("h2", "h2")
-SeatInfoMarkupElementHelper.simpleElement("h3", "h3")
-SeatInfoMarkupElementHelper.simpleElement("h4", "h4")
-SeatInfoMarkupElementHelper.simpleElement("h5", "h5")
-SeatInfoMarkupElementHelper.simpleElement("h6", "h6")
+SeatInfoMarkupElementHelper.simpleElement("p", "p", false)
+SeatInfoMarkupElementHelper.simpleElement("b", "b", true)
+SeatInfoMarkupElementHelper.simpleElement("i", "i", true)
+SeatInfoMarkupElementHelper.simpleElement("s", "s", true)
+SeatInfoMarkupElementHelper.simpleElement("h1", "h1", false)
+SeatInfoMarkupElementHelper.simpleElement("h2", "h2", false)
+SeatInfoMarkupElementHelper.simpleElement("h3", "h3", false)
+SeatInfoMarkupElementHelper.simpleElement("h4", "h4", false)
+SeatInfoMarkupElementHelper.simpleElement("h5", "h5", false)
+SeatInfoMarkupElementHelper.simpleElement("h6", "h6", false)
 
-SeatInfoMarkupElementHelper.simpleSelfClosingElement("br", "br")
-SeatInfoMarkupElementHelper.simpleSelfClosingElement("hr", "hr")
+SeatInfoMarkupElementHelper.simpleSelfClosingElement("br", "br", false)
+SeatInfoMarkupElementHelper.simpleSelfClosingElement("hr", "hr", false)
 
 //links
 function linkElementBuilder(elementInfo, htmlElement) {
@@ -170,13 +170,13 @@ function linkElementBuilder(elementInfo, htmlElement) {
     }
 }
 
-SeatInfoMarkupRenderer.registerElement("a", false, linkElementBuilder)
-SeatInfoMarkupElementHelper.simpleSelfClosingElement("pagelink", "span") // deprecated legacy element
+SeatInfoMarkupRenderer.registerElement("a", false, linkElementBuilder, true)
+SeatInfoMarkupElementHelper.simpleSelfClosingElement("pagelink", "span", true) // deprecated legacy element
 
 //lists
-SeatInfoMarkupElementHelper.simpleElement("li", "li")
-SeatInfoMarkupElementHelper.simpleLimitedContentElement("ul", "ul", ["li"], false)
-SeatInfoMarkupElementHelper.simpleLimitedContentElement("ol", "ol", ["li"], false)
+SeatInfoMarkupElementHelper.simpleElement("li", "li", false)
+SeatInfoMarkupElementHelper.simpleLimitedContentElement("ul", "ul", ["li"], false, false)
+SeatInfoMarkupElementHelper.simpleLimitedContentElement("ol", "ol", ["li"], false, false)
 
 //tables
 SeatInfoMarkupRenderer.registerElement("table", false, function (elementInfo, htmlElement) {
@@ -206,7 +206,7 @@ SeatInfoMarkupRenderer.registerElement("table", false, function (elementInfo, ht
         dom: table,
         supportedElementProperties: ["stripes", "border"]
     }
-})
+}, false)
 
 function tableCellElementBuilder(type, elementInfo, htmlElement) {
     const cell = htmlElement(type).content(elementInfo.content)
@@ -231,13 +231,13 @@ function tableCellElementBuilder(type, elementInfo, htmlElement) {
 
 SeatInfoMarkupRenderer.registerElement("td", false, function (elementInfo, htmlElement) {
     return tableCellElementBuilder("td", elementInfo, htmlElement)
-})
+}, false)
 SeatInfoMarkupRenderer.registerElement("th", false, function (elementInfo, htmlElement) {
     return tableCellElementBuilder("th", elementInfo, htmlElement)
-})
-SeatInfoMarkupElementHelper.simpleLimitedContentElement("tr", "tr", ["td", "th"], false)
-SeatInfoMarkupElementHelper.simpleLimitedContentElement("tbody", "tbody", ["tr"], false)
-SeatInfoMarkupElementHelper.simpleLimitedContentElement("thead", "thead", ["tr"], false)
+}, false)
+SeatInfoMarkupElementHelper.simpleLimitedContentElement("tr", "tr", ["td", "th"], false, false)
+SeatInfoMarkupElementHelper.simpleLimitedContentElement("tbody", "tbody", ["tr"], false, false)
+SeatInfoMarkupElementHelper.simpleLimitedContentElement("thead", "thead", ["tr"], false, false)
 
 //images
 function imageElementBuilder(elementInfo, htmlElement) {
@@ -285,7 +285,7 @@ SeatInfoMarkupRenderer.registerElement("img", true, function (elementInfo, htmlE
         noContent: true,
         supportedElementProperties: ["src", "alt"],
     }
-})
+}, false)
 SeatInfoMarkupRenderer.registerElement("icon", true, function (elementInfo, htmlElement) {
     return {
         dom: htmlElement("span").content(imageElementBuilder(elementInfo, htmlElement)).class("mx-1"),
@@ -293,7 +293,7 @@ SeatInfoMarkupRenderer.registerElement("icon", true, function (elementInfo, html
         supportedElementProperties: ["src", "alt"],
         disabledCommonProperties: ["text-align","click-to-copy"]
     }
-})
+}, true)
 
 function colorElementBuilder(elementInfo, htmlElement) {
     const color = htmlElement("span").content(elementInfo.content)
@@ -311,8 +311,8 @@ function colorElementBuilder(elementInfo, htmlElement) {
     }
 }
 
-SeatInfoMarkupRenderer.registerElement("color", false, colorElementBuilder)
-SeatInfoMarkupRenderer.registerElement("colour", false, colorElementBuilder)
+SeatInfoMarkupRenderer.registerElement("color", false, colorElementBuilder, true)
+SeatInfoMarkupRenderer.registerElement("colour", false, colorElementBuilder, true)
 
 //multimedia helper functions
 const formatSeconds = (duration) => {
@@ -429,7 +429,7 @@ SeatInfoMarkupRenderer.registerElement("audio", true, function (elementInfo, htm
             disabledCommonProperties: ["text-align","click-to-copy"]
         }
     }
-})
+}, false)
 
 SeatInfoMarkupRenderer.registerElement("fit", false, (elementInfo, htmlElement) => {
     const container = htmlElement("div")
@@ -531,7 +531,7 @@ SeatInfoMarkupRenderer.registerElement("fit", false, (elementInfo, htmlElement) 
         supportedElementProperties: ["from"],
         disabledCommonProperties: ["text-align","click-to-copy"]
     }
-})
+}, false)
 
 //video
 SeatInfoMarkupRenderer.registerElement("video", true, (elementInfo, htmlElement) => {
@@ -635,5 +635,5 @@ SeatInfoMarkupRenderer.registerElement("video", true, (elementInfo, htmlElement)
             disabledCommonProperties: ["text-align","click-to-copy"]
         }
     }
-})
+}, false)
 

@@ -267,7 +267,7 @@ class ASTTag extends ASTBase {
 class ASTText extends ASTBase {
     constructor(tokens, parent) {
         super(tokens);
-        this.text = tokens.reduce((string, token) => string + token.src, "").trim()
+        this.text = tokens.reduce((string, token) => string + token.src, "")
         this.parent = parent
     }
 }

@@ -120,10 +120,11 @@ class SeatInfoMarkupRenderer {
     static LINK_PREPROCESSORS_REGISTRY = {}
     static COMMON_PROPERTY_REGISTRY = {}
 
-    static registerElement(name, isSelfClosing, element) {
+    static registerElement(name, isSelfClosing, element, isInlineElement=true) {
         SeatInfoMarkupRenderer.ELEMENT_REGISTRY[name] = {
             selfClosing: isSelfClosing,
-            builder: element
+            builder: element,
+            isInlineElement: isInlineElement,
         }
     }
 
@@ -178,14 +179,18 @@ class SeatInfoMarkupRenderer {
         const ast = parse(lines)
         this.warnings = this.warnings.concat(ast.warnings)
 
-        const buildContentRecursive = (astContent) => {
+        const buildContentRecursive = (astContent, isInlineElement=true) => {
             const content = []
 
             for (const astNode of astContent) {
 
                 if (astNode instanceof ASTText) {
                     const textNode = document.createElement("span") // we can't use a text node, because they don't fire events, which is required for the astNodeClickCallback
-                    textNode.textContent = astNode.text
+                    let text = astNode.text
+                    if(!isInlineElement) {
+                        text = text.trimStart()
+                    }
+                    textNode.textContent = text
 
                     if (astNodeClickCallback) {
                         textNode.addEventListener("click", (e) => {
@@ -205,14 +210,15 @@ class SeatInfoMarkupRenderer {
                         this.warn(new MarkupWarning(astNode.tokens, `Unknown tag type <${astNode.tagName}>!`))
 
                         //still build children
-                        content.push(...buildContentRecursive(astNode.content))
+                        content.push(...buildContentRecursive(astNode.content, false))
 
                     } else {
+                        const isInlineElement = elementImplementation.isInlineElement || false
 
                         const elementInfo = {
                             node: astNode,
                             properties: astNode.properties,
-                            content: buildContentRecursive(astNode.content),
+                            content: buildContentRecursive(astNode.content, isInlineElement),
                             renderer: this
                         }
 
@@ -284,7 +290,7 @@ class SeatInfoMarkupRenderer {
             return content
         }
 
-        const rootContent = buildContentRecursive(ast.rootNode.content)
+        const rootContent = buildContentRecursive(ast.rootNode.content, false)
 
         for (const rootContentNode of rootContent) {
             targetContainer.appendChild(rootContentNode.dom)
