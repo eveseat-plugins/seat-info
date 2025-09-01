@@ -492,8 +492,17 @@
                     const item = response.results[i];
                     const btn = document.createElement("button")
                     btn.classList.add("dropdown-item")
+                    btn.classList.add("px-1")
                     btn.type = "button"
-                    btn.textContent = item.text
+
+                    const img = document.createElement("img")
+                    img.src=`https://images.evetech.net/types/${item.id}/icon?size=32`
+                    img.width = 24
+                    img.classList.add("mr-1")
+                    btn.appendChild(img)
+
+                    btn.append(item.text)
+
                     btnTarget.appendChild(btn)
                     btn.addEventListener("click", function () {
                         editor.updateSelection(null, null, null, `<icon src="eve:type-icon/${item.id}/${item.text}" alt="${item.text}" />`)
