@@ -95,7 +95,7 @@
 
                             <div class="form-group">
                                 <p>{{ trans('info::info.editor_syntax_documentation_link') }} <a
-                                            href="https://github.com/recursivetree/seat-info/blob/master/documentation.md"
+                                            href="https://github.com/recursivetree/seat-info/blob/main/documentation.md"
                                             target="_blank">{{ trans('info::info.link') }}</a></p>
                             </div>
 
