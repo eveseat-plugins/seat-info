@@ -92,6 +92,13 @@
                                     </div>
                                 </div>
 
+                                <div class="d-flex align-items-center">
+                                    <input type="radio" name="color-selector" checked id="color-primary-radio">
+                                    <input type="color" id="color-primary" value="#CB444A">
+                                    <input type="radio" name="color-selector" id="color-secondary-radio">
+                                    <input type="color" id="color-secondary" value="#53A551">
+                                </div>
+
                                 <div class="d-flex w-100" style="height: 60vh;">
                                     <div class="w-50">
                                          <div class="w-100 h-100 form-control text-sm" id="text"></div>
@@ -164,6 +171,36 @@
         form.addEventListener("submit",()=>{
             window.removeEventListener("beforeunload",beforeUnload)
         })
+
+        // color picker system
+        const colorTextBtn = document.getElementById("button-insert-color")
+        const primaryColorPicker = document.getElementById("color-primary")
+        const secondaryColorPicker = document.getElementById("color-secondary")
+        const primaryColorRadio = document.getElementById("color-primary-radio")
+        const secondaryColorRadio = document.getElementById("color-secondary-radio")
+        function syncColor() {
+            colorTextBtn.style.color = getActiveColor()
+        }
+        function getActiveColor() {
+            if(primaryColorRadio.checked){
+                return primaryColorPicker.value;
+            } else {
+                return secondaryColorPicker.value;
+            }
+        }
+        primaryColorPicker.addEventListener("click",function (){
+            primaryColorRadio.checked = true
+            syncColor()
+        })
+        secondaryColorPicker.addEventListener("click",function (){
+            secondaryColorRadio.checked = true
+            syncColor()
+        })
+        primaryColorPicker.addEventListener("change",syncColor)
+        secondaryColorPicker.addEventListener("change",syncColor)
+        primaryColorRadio.addEventListener("change",syncColor)
+        secondaryColorRadio.addEventListener("change",syncColor)
+        syncColor()
 
 
         class MarkupEditor {
@@ -425,7 +462,7 @@
             editor.updateSelection(null,null, null, "<ol>\n    <li>\n    </li>\n    <li>\n    </li>\n    <li>\n    </li>\n</ol>")
         })
         document.getElementById("button-insert-color").addEventListener("click", function () {
-            editor.updateSelection("color","<color color=\"red\">", "</color>", null, position_after_center_section=true)
+            editor.updateSelection("color",`<color color="${getActiveColor()}">`, "</color>", null, position_after_center_section=true)
         })
 
         let iconSearchAbort = new AbortController()
