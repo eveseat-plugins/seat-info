@@ -46,6 +46,14 @@ SeatInfoMarkupRenderer.registerLinkPreProcessor("seatfitting", (link) => {
     return ReturnStatus.new().warning("Invalid fitting link!")
 })
 
+SeatInfoMarkupRenderer.registerLinkPreProcessor("eve", (link) => {
+    const iconLink = /^type-icon\/(?<type_id>\d+)(?:\/.+)?$/gm.exec(link)
+    if(iconLink) {
+        return ReturnStatus.new().ok(`https://images.evetech.net/types/${iconLink.groups.type_id}/icon?size=32`)
+    }
+    return ReturnStatus.new().warning("Invalid eve icon link!")
+})
+
 SeatInfoMarkupRenderer.registerCommonProperty("id", (value, elementData) => {
     elementData.htmlBuilder.attribute("id", value.value)
 })
@@ -280,7 +288,7 @@ SeatInfoMarkupRenderer.registerElement("img", true, function (elementInfo, htmlE
 })
 SeatInfoMarkupRenderer.registerElement("icon", true, function (elementInfo, htmlElement) {
     return {
-        dom: htmlElement("span").content(imageElementBuilder(elementInfo, htmlElement)),
+        dom: htmlElement("span").content(imageElementBuilder(elementInfo, htmlElement)).class("mx-1"),
         noContent: true,
         supportedElementProperties: ["src", "alt"],
         disabledCommonProperties: ["text-align","click-to-copy"]
