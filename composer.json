@@ -2,7 +2,7 @@
   "name": "recursivetree/seat-info",
   "description": "A SeAT module that adds a small article systems for example as a corporation bulletin",
   "type": "seat-plugin",
-  "license": "MIT",
+  "license": "GPL-2.0-only",
   "authors": [
     {
       "name": "recursive_tree",
